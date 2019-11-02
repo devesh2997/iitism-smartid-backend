@@ -1,4 +1,4 @@
-const { Merchant }          = require('../models');
+const { Merchant, User }          = require('../models');
 const authService       = require('../services/auth.service');
 const { to, ReE, ReS }  = require('../services/util.service');
 
@@ -19,12 +19,53 @@ const create = async function(req, res){
 }
 module.exports.create = create;
 
+const getTransactions = async function (req, res) {
+    let merchant = req.merchant
+  
+    ;[err, transactions] = await to(merchant.getTransactions({order:[['created_at','DESC']]}))
+  
+    if (err) return ReE(res, err, 422)
+  
+    for (let i = 0; i < transactions.length; i++) {
+      let transaction = transactions[i]
+      transaction = transaction.toWeb()
+      let err, user, admin
+      ;[err, user] = await to(User.findById(transaction.user_id))
+      if (err) return ReE(res, err, 422)
+      let user_json = {}
+      user_json.first_name = user.first_name
+      user_json.middle_name = user.middle_name
+      user_json.last_name = user.last_name
+      transaction.user = user_json
+      transactions[i] = transaction
+    }
+  
+    return ReS(res, { transactions: transactions })
+  }
+  
+  module.exports.getTransactions = getTransactions
+
 const get = async function(req, res){
     let merchant = req.merchant;
 
     return ReS(res, {merchant:merchant.toWeb()});
 }
 module.exports.get = get;
+
+const getAll = async function (req, res) {
+    ;[err, merchants] = await to(Merchant.findAll())
+  
+    let merchants_json = []
+  
+    for (let i in merchants) {
+      let merchant = merchants[i]
+      // console.log(i, userdump)
+      merchants_json.push(merchant.toWeb())
+    }
+    return ReS(res, { merchants: merchants_json })
+  }
+  
+  module.exports.getAll = getAll
 
 const update = async function(req, res){
     let err, merchant, data

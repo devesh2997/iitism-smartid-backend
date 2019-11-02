@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         course_id      : DataTypes.STRING,
         email     : {type: DataTypes.STRING, allowNull: true, unique: false, validate: { isEmail: {msg: "Email invalid."} }},
         mobile_no     : {type: DataTypes.STRING, allowNull: true, unique: true, validate: { len: {args: [7, 20], msg: "Phone number invalid, too short."}, isNumeric: { msg: "not a valid phone number."} }},
-        smartid_no      :{type:DataTypes.STRING, allowNull:false},
+        smartid_no      :{type:DataTypes.STRING, allowNull:false, unique: true},
         balance        : DataTypes.DOUBLE,
         password  : DataTypes.STRING,
     }, {underscored: true});

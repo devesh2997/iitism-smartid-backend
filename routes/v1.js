@@ -1,6 +1,7 @@
 const express 			= require('express');
 const router 			= express.Router();
 
+const TransactionController = require('../controllers/transaction.controller')
 const UserController 	= require('../controllers/user.controller');
 const MerchantController = require('../controllers/merchant.controller')
 const UserDumpController = require('../controllers/userdump.controller')
@@ -20,19 +21,23 @@ router.get('/', function(req, res, next) {
   res.json({status:"success", message:"Parcel Pending APIS", data:{"version_number":"v1.0.0"}})
 });
 
+router.post(    '/transactions/credit',    passport.authenticate('jwt', {session:false}), TransactionController.credit);  
+
 
 router.post(    '/users',           passport.authenticate('jwt', {session:false}), UserController.create);                                                    // C
 router.get(     '/users',           passport.authenticate('jwt', {session:false}), UserController.get);        // R
 router.get(     '/admin/user/:admn_no',  passport.authenticate('jwt', {session:false}), custom.user, UserController.get);        // R
 router.get(     '/user/:admn_no',  passport.authenticate('user-jwt', {session:false}), custom.user, UserController.get);        // R
+router.get(     '/user/transactions/:admn_no',  passport.authenticate('user-jwt', {session:false}), custom.user, UserController.getTransactions);        // R
 router.put(     '/users',           passport.authenticate('jwt', {session:false}), UserController.update);     // U
 router.delete(  '/users',           passport.authenticate('jwt', {session:false}), UserController.remove);     // D
 router.post(    '/users/login',     UserController.login);
 
 router.post(    '/merchants',           passport.authenticate('jwt', {session:false}), MerchantController.create);                                                    // C
-router.get(     '/merchants',           passport.authenticate('jwt', {session:false}), MerchantController.get);        // R
+router.get(     '/merchants',           passport.authenticate('jwt', {session:false}), MerchantController.getAll);        // R
 router.get(     '/admin/merchant/:admn_no',  passport.authenticate('jwt', {session:false}), custom.merchant, MerchantController.get);        // R
-router.get(     '/merchant/:merchant_id',  passport.authenticate('merchant-jwt', {session:false}), custom.merchant, MerchantController.get);        // R
+router.get(     '/merchant/:merchant_id',  passport.authenticate('merchant-jwt', {session:false}), custom.merchant, MerchantController.get);
+router.get(     '/merchant/transactions/:merchant_id',  passport.authenticate('merchant-jwt', {session:false}), custom.merchant, MerchantController.getTransactions);        // R
 router.put(     '/merchants',           passport.authenticate('jwt', {session:false}), MerchantController.update);     // U
 router.delete(  '/merchants',           passport.authenticate('jwt', {session:false}), MerchantController.remove);     // D
 router.post(    '/merchants/login',     MerchantController.login);

@@ -6,7 +6,7 @@ const {TE, to}          = require('../services/util.service');
 const CONFIG            = require('../config/config');
 
 module.exports = (sequelize, DataTypes) => {
-    var Model = sequelize.define('Userdump', {
+    var Model = sequelize.define('UserDump', {
         admn_no         :DataTypes.STRING,
         first_name     : DataTypes.STRING,
         middle_name      : {type:DataTypes.STRING, allowNull:true},

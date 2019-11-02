@@ -82,7 +82,6 @@ const getAll = async function (req, res) {
     userdumps_json.push(userdump.toWeb())
   }
 
-  console.log('userdumps_json', userdumps_json)
   return ReS(res, { userdumps: userdumps_json })
 }
 
