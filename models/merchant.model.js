@@ -17,9 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         password  : DataTypes.STRING,
     }, {underscored: true});
 
-    Model.associate = function(models){
-        this.hasMany(models.Transaction, {as: 'Transactions'})
-    }
+    // Model.associate = function(models){
+    //     this.hasMany(models.Transaction, {as: 'Transactions'})
+    // }
 
 
     Model.beforeSave(async (merchant, options) => {

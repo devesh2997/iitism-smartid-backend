@@ -10,7 +10,6 @@ const create = async function (req, res) {
     return ReE(res, 'Please enter a password to register.')
   } else {
     let err, user
-
     ;[err, user] = await to(authService.createUser(body))
 
     if (err) return ReE(res, err, 422)
@@ -30,7 +29,9 @@ module.exports.create = create
 const getTransactions = async function (req, res) {
   let user = req.user
 
-  ;[err, transactions] = await to(user.getTransactions({order:[['created_at','DESC']]}))
+  ;[err, transactions] = await to(
+    user.getTransactions({ order: [['created_at', 'DESC']] })
+  )
 
   if (err) return ReE(res, err, 422)
 
@@ -38,15 +39,20 @@ const getTransactions = async function (req, res) {
     let transaction = transactions[i]
     transaction = transaction.toWeb()
     let err, user, admin
-    ;[err, merchant] = await to(Merchant.findById(transaction.merchant_id))
-    if (err) return ReE(res, err, 422)
-    let merchant_json = {}
-    merchant_json.business_name = merchant.business_name
-    merchant_json.first_name = merchant.first_name
-    merchant_json.middle_name = merchant.middle_name
-    merchant_json.last_name = merchant.last_name
-    transaction.merchant = merchant_json
-    transactions[i] = transaction
+    if (
+      transaction.merchant_id !== undefined &&
+      transaction.merchant_id !== null
+    ) {
+      ;[err, merchant] = await to(Merchant.findById(transaction.merchant_id))
+      if (err) return ReE(res, err, 422)
+      let merchant_json = {}
+      merchant_json.business_name = merchant.business_name
+      merchant_json.first_name = merchant.first_name
+      merchant_json.middle_name = merchant.middle_name
+      merchant_json.last_name = merchant.last_name
+      transaction.merchant = merchant_json
+      transactions[i] = transaction
+    }
   }
 
   return ReS(res, { transactions: transactions })
@@ -66,10 +72,11 @@ const update = async function (req, res) {
   user = req.user
   data = req.body
   user.set(data)
-
   ;[err, user] = await to(user.save())
   if (err) {
-    if (err.message == 'Validation error') { err = 'The email address or phone number is already in use' }
+    if (err.message == 'Validation error') {
+      err = 'The email address or phone number is already in use'
+    }
     return ReE(res, err)
   }
   return ReS(res, { message: 'Updated User: ' + user.email })
@@ -79,7 +86,6 @@ module.exports.update = update
 const remove = async function (req, res) {
   let user, err
   user = req.user
-
   ;[err, user] = await to(user.destroy())
   if (err) return ReE(res, 'error occured trying to delete user')
 
@@ -90,7 +96,6 @@ module.exports.remove = remove
 const login = async function (req, res) {
   const body = req.body
   let err, user
-
   ;[err, user] = await to(authService.authUser(req.body))
   if (err) return ReE(res, err, 422)
 

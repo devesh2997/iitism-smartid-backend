@@ -11,6 +11,9 @@ const credit = async function (req, res) {
     .transaction(function (t) {
       return User.findById(transaction_info.user_id, { transaction: t }).then(
         function (user) {
+          if (user === undefined || user === null) {
+            return { error: true }
+          }
           user.balance += Number(transaction_info.amount)
           return user.save({ transaction: t }).then(function (user) {
             return Transaction.create(transaction_info, { transaction: t })
@@ -20,6 +23,7 @@ const credit = async function (req, res) {
     })
     .then(function (result) {
       console.log(result)
+      if (result.error === true) { return ReE(res, { error: 'user does not exist' }, 201) }
       return ReS(res, { transaction: result }, 201)
     })
     .catch(function (err) {

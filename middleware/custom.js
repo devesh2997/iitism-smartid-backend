@@ -83,7 +83,7 @@ module.exports.queryUserDump = queryUserDump
 
 let user = async function (req, res, next) {
   let admn_no, err
-  console.log(req.params)
+  // console.log(req.params)
   admn_no = req.params.admn_no
   ;[err, user] = await to(User.findOne({ where: { admn_no: admn_no } }))
   if (err) return ReE(res, 'err finding user')
